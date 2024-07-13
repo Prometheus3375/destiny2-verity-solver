@@ -1,3 +1,3 @@
-from .base import LEFT, MIDDLE, PositionsType, RIGHT, StateWithAllPositions
+from .base import *
 from .rooms import *
 from .statues import *
