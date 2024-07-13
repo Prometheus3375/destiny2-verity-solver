@@ -57,16 +57,22 @@ class State:
 
     @property
     def is_done(self, /) -> bool:
-        """Whether this state is done."""
+        """
+        Whether this state is done.
+        """
         raise NotImplementedError
 
     @property
     def shapes_available(self, /) -> tuple[Shape2D, ...]:
-        """List of shapes available in this state."""
+        """
+        List of shapes available in this state.
+        """
         return self.shapes_to_give
 
     def is_shape_required(self, shape: Shape2D, /) -> bool:
-        """Return ``True`` if to be done this state requires passed shape."""
+        """
+        Return ``True`` if to be done this state requires passed shape.
+        """
         return shape in self.shapes_to_receive
 
 
