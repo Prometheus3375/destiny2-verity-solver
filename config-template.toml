@@ -1,0 +1,59 @@
+is_doing_triumph = false
+# Whether players are going to complete triumph on Verity encounter.
+# If not present, defaults to false.
+
+last_position = ''
+# Position of the statue (left, middle or right)
+# with which players interacted last time.
+# Empty string denotes no position.
+# If not present, defaults to an empty string.
+# It is required only if player are doing triumph.
+
+# Mapping of numbers to shapes:
+# 0 - circle
+# 3 - triangle
+# 4 - square
+# 20 - sphere
+# 23 or 33 - pyramid
+# 24 or 44 - cube
+# 30 - cone
+# 40 - cylinder
+# 34 or 43 - prism
+
+inner_shapes = [4, 0, 3]
+# Numeric numbers of three 2D shapes
+# which are held by statues in solo rooms from left to right.
+# Must be present.
+
+held_shapes = [
+    20,
+    23,
+    24,
+]
+# Numeric numbers of three 3D shapes
+# which are held by statues in the main room from left to right.
+# Must be present.
+
+# Players in solo rooms.
+# All three must be present.
+# alias - player's nickname.
+# their_shape - a 2D shape which is held by their statue.
+# other_shape - a 2D shape which can be dropped in their room besides their shape.
+# For example, if player is triangle and shapes on room's wall are triangle and circle,
+# then their_shape is triangle and other_shape is circle.
+# If player is triangle and shapes on room's wall are both triangles,
+# then their_shape is triangle and other_shape is triangle as well.
+[player1]
+alias = 'A'
+their_shape = 3
+other_shape = 4
+
+[player2]
+alias = 'B'
+their_shape = 4
+other_shape = 0
+
+[player3]
+alias = 'C'
+their_shape = 0
+other_shape = 3
