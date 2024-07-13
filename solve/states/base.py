@@ -1,6 +1,6 @@
 from collections.abc import Iterable, Iterator
 from inspect import signature
-from typing import Literal, Protocol, Self
+from typing import Literal, Protocol, Self, TypeGuard
 
 from solve.shapes import Shape2D
 
@@ -8,8 +8,16 @@ LEFT: Literal['left'] = 'left'
 MIDDLE: Literal['middle'] = 'middle'
 RIGHT: Literal['right'] = 'right'
 type PositionsType = Literal['left', 'middle', 'right']
-POSITIONS = dict.fromkeys((LEFT, MIDDLE, RIGHT))
-POSITIONS_MSG = f'{LEFT!r}, {MIDDLE!r} or {RIGHT!r}'
+
+_POSITIONS = {LEFT, MIDDLE, RIGHT}
+_POSITIONS_MSG = f'{LEFT!r}, {MIDDLE!r} or {RIGHT!r}'
+
+
+def is_position(s: str, /) -> TypeGuard[PositionsType]:
+    """
+    Returns ``True`` if a string is a valid position.
+    """
+    return s in _POSITIONS
 
 
 class PMove(Protocol):
@@ -40,8 +48,8 @@ class State:
             shapes_to_give: Iterable[Shape2D],
             shapes_to_receive: Iterable[Shape2D],
             ) -> None:
-        assert position in POSITIONS, \
-            f'position of a state must be {POSITIONS_MSG}, got {position!r}'
+        assert is_position(position), \
+            f'position of a state must be {_POSITIONS_MSG}, got {position!r}'
         self.position = position
         self.own_shape = own_shape
         self.shapes_to_give = tuple(shapes_to_give)
@@ -75,7 +83,7 @@ class StateWithAllPositions[S: State, M: PMove]:
         self.moves_made = moves_made
 
     # region Verify that constructor and slots has POSITIONS
-    assert set(__slots__) >= POSITIONS.keys(), f'encounter state must have position attributes'
+    assert set(__slots__) >= _POSITIONS, f'encounter state must have position attributes'
 
     signature_ = signature(__init__)
     kwargs = {
@@ -84,7 +92,7 @@ class StateWithAllPositions[S: State, M: PMove]:
         if p.kind is p.KEYWORD_ONLY or p.kind is p.POSITIONAL_OR_KEYWORD
         }
 
-    assert kwargs >= POSITIONS.keys(), f'encounter state must have position keyword arguments'
+    assert kwargs >= _POSITIONS, f'encounter state must have position keyword arguments'
     del signature_, kwargs
     # endregion
 
@@ -126,4 +134,13 @@ class StateWithAllPositions[S: State, M: PMove]:
         )
 
 
-__all__ = 'LEFT', 'MIDDLE', 'RIGHT', 'PositionsType', 'State', 'PMove', 'StateWithAllPositions'
+__all__ = (
+    'LEFT',
+    'MIDDLE',
+    'RIGHT',
+    'PositionsType',
+    'is_position',
+    'State',
+    'PMove',
+    'StateWithAllPositions',
+    )
