@@ -75,6 +75,18 @@ class State:
         """
         return shape in self.shapes_to_receive
 
+    def __repr__(self, /) -> str:
+        attrs = ', '.join(f'{attr}={getattr(self, attr)}' for attr in self.__slots__)
+        return (
+            f'{self.__class__.__name__}('
+            f'{self.position.upper()}, '
+            f'own_shape={self.own_shape}, '
+            f'shapes_to_give={self.shapes_to_give}, '
+            f'shapes_to_receive={self.shapes_to_receive}, '
+            f'{attrs}'
+            f')'
+        )
+
 
 class StateWithAllPositions[S: State, M: PMove]:
     """
@@ -132,9 +144,9 @@ class StateWithAllPositions[S: State, M: PMove]:
     def __repr__(self, /) -> str:
         return (
             f'{self.__class__.__name__}('
-            f'{self.left!r}, '
-            f'{self.middle!r}, '
-            f'{self.right!r}, '
+            f'{self.left}, '
+            f'{self.middle}, '
+            f'{self.right}, '
             f'{self.moves_made}'
             f')'
         )
