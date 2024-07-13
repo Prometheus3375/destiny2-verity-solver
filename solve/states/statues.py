@@ -130,6 +130,8 @@ def init_statues(**kw: Unpack[InitStatuesKwargs]) -> StateOfAllStatues:
     assert all(isinstance(s, Shape2D) for s in inner), f'all inner shapes must be 2D'
     held = kw['left_held_shape'], kw['middle_held_shape'], kw['right_held_shape']
     assert all(isinstance(s, Shape3D) for s in held), f'all held shapes must be 3D'
+    assert all(d2 in d3.terms for d2, d3 in zip(inner, held)), \
+        f'every held shape must contain respective inner shape at least once'
 
     c1 = Counter(inner)
     assert all(v == 1 for v in c1.values()), f'the number of all inner shapes must be 1, got {c1}'
