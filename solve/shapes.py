@@ -8,6 +8,8 @@ class Shape:
     def __str__(self, /) -> str:
         return self.name
 
+    __repr__ = __str__
+
     def __hash__(self, /) -> int:
         return hash(self.name)
 
