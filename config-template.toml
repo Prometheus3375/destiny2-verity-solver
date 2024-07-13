@@ -4,10 +4,10 @@ is_doing_triumph = false
 
 last_position = ''
 # Position of the statue (left, middle or right)
-# with which players interacted last time.
+# with which players have interacted last time.
 # Empty string denotes no position.
 # If not present, defaults to an empty string.
-# It is required only if player are doing triumph.
+# It is required only if players are doing triumph.
 
 # Mapping of numbers to shapes:
 # 0 - circle
