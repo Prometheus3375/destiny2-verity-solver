@@ -11,6 +11,8 @@ def print_pass_moves(
     Prints pass moves to the console.
     If ``interactive`` is ``True``, prompts the user before continuing.
     """
+    print('--- STEPS IN SOLO ROOMS ---')
+
     print_move = input if interactive else print
     for m in moves:
         print_move(
@@ -32,6 +34,8 @@ def print_dissect_moves(moves: list[DissectMove], /, interactive: bool) -> None:
     Prints dissect moves to the console.
     If ``interactive`` is ``True``, prompts the user before continuing.
     """
+    print('--- STEPS FOR DISSECTION ---')
+
     print_move = input if interactive else print
     for m in moves:
         print_move(f'Dissect {m.shape} from {m.destination}')
