@@ -9,6 +9,7 @@ LIMIT_STATUES = 3
 
 
 def solve_rooms(
+        *,
         is_doing_triumph: bool,
         last_position: PositionsType | None,
         **kw: Unpack[InitRoomsKwargs],
@@ -22,6 +23,7 @@ def solve_rooms(
 
 
 def solve_statues(
+        *,
         is_doing_triumph: bool,
         last_position: PositionsType | None,
         **kw: Unpack[InitStatuesKwargs],
