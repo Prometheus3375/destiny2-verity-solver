@@ -26,18 +26,17 @@ class StatueState(State):
             shapes_to_give: Iterable[Shape2D] | None = None,
             shapes_to_receive: Iterable[Shape2D] | None = None,
             ) -> None:
-        required = shape2opposite[own_shape]
         self.shape_held = shape_held
 
         if shapes_to_give is None:
             shapes_to_give = (
                 shape
                 for shape in shape_held.terms
-                if shape not in required
+                if shape not in shape2opposite[own_shape]
                 )
 
         if shapes_to_receive is None:
-            shapes_to_receive = required.difference(self.shape_held.terms)
+            shapes_to_receive = shape2opposite[own_shape].difference(self.shape_held.terms)
 
         super().__init__(
             position=position,
