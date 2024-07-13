@@ -2,9 +2,9 @@ import tomllib
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from .players import Player
+from .players import *
 from .shapes import *
-from .states import LEFT, MIDDLE, PositionsType, RIGHT, is_position
+from .states import *
 
 number2shape = {
     0:  circle,
@@ -31,6 +31,26 @@ class Config:
     players: Sequence[Player]
     is_doing_triumph: bool
     last_position: PositionsType | None
+
+    def init_rooms(self, /) -> tuple[StateOfAllRooms, dict[PositionsType, str]]:
+        """
+        Creates the initial state of all solo rooms using this config
+        with a mapping of positions to player aliases.
+        """
+        return init_rooms_from_players(self.players, self.inner_shapes)
+
+    def init_statues(self, /) -> StateOfAllStatues:
+        """
+        Creates the initial state of all statues in the main room using this config.
+        """
+        return init_statues(
+            left_inner_shape=self.inner_shapes[0],
+            left_held_shape=self.held_shapes[0],
+            middle_inner_shape=self.inner_shapes[1],
+            middle_held_shape=self.held_shapes[1],
+            right_inner_shape=self.inner_shapes[2],
+            right_held_shape=self.held_shapes[2],
+            )
 
 
 def read_config(filepath: str, /) -> Config:
