@@ -14,7 +14,7 @@ class Shape:
         return hash(self.name)
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(repr=False, eq=False, frozen=True, slots=True)
 class Shape2D(Shape):
     def __add__(self, other: 'Shape2D', /) -> 'Shape3D':
         result = _addition.get((self, other))
@@ -23,7 +23,7 @@ class Shape2D(Shape):
     __iadd__ = __add__
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(repr=False, eq=False, frozen=True, slots=True)
 class Shape3D(Shape):
     terms: tuple[Shape2D, Shape2D]
 
