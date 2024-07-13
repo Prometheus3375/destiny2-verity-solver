@@ -2,7 +2,7 @@ from collections import Counter
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from itertools import chain, permutations, product
-from typing import Self, Unpack
+from typing import Self, TypedDict, Unpack
 
 from .base import *
 from ..shapes import *
@@ -114,7 +114,7 @@ class StateOfAllStatues(StateWithAllPositions[StatueState, DissectMove]):
                     yield StateOfAllStatues(**kwargs)
 
 
-class InitStatuesKwargs:
+class InitStatuesKwargs(TypedDict):
     left_inner_shape: Shape2D
     left_held_shape: Shape3D
     middle_inner_shape: Shape2D
@@ -127,15 +127,9 @@ def init_statues(**kw: Unpack[InitStatuesKwargs]) -> StateOfAllStatues:
     """
     A convenience function to specify the initial state of all statues in the main room.
     """
-    inner = [
-        kw[name]
-        for name in ('left_inner_shape', 'middle_inner_shape', 'right_inner_shape')
-        ]
+    inner = kw['left_inner_shape'], kw['middle_inner_shape'], kw['right_inner_shape']
     assert all(isinstance(s, Shape2D) for s in inner), f'all inner shapes must be 2D'
-    held = [
-        kw[name]
-        for name in ('left_held_shape', 'middle_held_shape', 'right_held_shape')
-        ]
+    held = kw['left_held_shape'], kw['middle_held_shape'], kw['right_held_shape']
     assert all(isinstance(s, Shape3D) for s in held), f'all held shapes must be 3D'
 
     c1 = Counter(inner)
