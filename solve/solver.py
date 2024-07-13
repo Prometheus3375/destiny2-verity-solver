@@ -1,19 +1,41 @@
 from itertools import chain
+from typing import Unpack
 
-from .positions import StateWithPositions
-from .rooms import PassMove, init_rooms
 from .shapes import *
-from .statues import DissectMove, init_statues
+from .states import *
 
 LIMIT_ROOMS = 6
 LIMIT_STATUES = 3
 
 
+def solve_rooms(
+        is_doing_triumph: bool,
+        last_position: PositionsType | None,
+        **kw: Unpack[InitRoomsKwargs],
+        ) -> tuple[list[PassMove], PositionsType]:
+    """
+    A convenience function to solve all solo rooms.
+    """
+    initial_state = init_rooms(**kw)
+    final = solve_state(initial_state, LIMIT_ROOMS, is_doing_triumph, last_position)
+    return list(final.moves_made), final.last_position
+
+
+def solve_statues(
+        is_doing_triumph: bool,
+        last_position: PositionsType | None,
+        **kw: Unpack[InitStatuesKwargs],
+        ) -> tuple[list[DissectMove], PositionsType]:
+    """
+    A convenience function to solve all statues.
+    """
+    initial_state = init_statues(**kw)
+    final = solve_state(initial_state, LIMIT_STATUES, is_doing_triumph, last_position)
+    return list(final.moves_made), final.last_position
+
+
 def solve_encounter(
         *,
-        left_alias: str,
-        middle_alias: str,
-        right_alias: str,
         left_inner_shape: Shape2D,
         left_other_shape: Shape2D,
         middle_inner_shape: Shape2D,
@@ -24,46 +46,43 @@ def solve_encounter(
         middle_held_shape: Shape3D,
         right_held_shape: Shape3D,
         is_doing_triumph: bool,
-        ) -> tuple[list[PassMove], list[DissectMove]]:
+        last_position: PositionsType | None,
+        ) -> tuple[list[PassMove], list[DissectMove], PositionsType]:
     """
     Initializes Verity encounter, solves it and returns necessary moves.
     """
-    initial_room_state = init_rooms(
-        left_alias=left_alias,
-        left_shape=left_inner_shape,
+    pass_moves, last_position = solve_rooms(
+        left_inner_shape=left_inner_shape,
         left_other_shape=left_other_shape,
-        middle_alias=middle_alias,
-        middle_shape=middle_inner_shape,
+        middle_inner_shape=middle_inner_shape,
         middle_other_shape=middle_other_shape,
-        right_alias=right_alias,
-        right_shape=right_inner_shape,
+        right_inner_shape=right_inner_shape,
         right_other_shape=right_other_shape,
+        is_doing_triumph=is_doing_triumph,
+        last_position=last_position,
         )
 
-    initial_statue_state = init_statues(
-        left_alias=left_alias,
+    dissect_moves, last_position = solve_statues(
         left_inner_shape=left_inner_shape,
         left_held_shape=left_held_shape,
-        middle_alias=middle_alias,
         middle_inner_shape=middle_inner_shape,
         middle_held_shape=middle_held_shape,
-        right_alias=right_alias,
         right_inner_shape=right_inner_shape,
         right_held_shape=right_held_shape,
+        is_doing_triumph=is_doing_triumph,
+        last_position=last_position,
         )
 
-    room_moves, lp = solve_state(initial_room_state, LIMIT_ROOMS, is_doing_triumph)
-    statue_moves, _ = solve_state(initial_statue_state, LIMIT_STATUES, is_doing_triumph, lp)
-    return room_moves, statue_moves
+    return pass_moves, dissect_moves, last_position
 
 
 def solve_state[S, M](
-        initial_state: StateWithPositions[S, M],
+        initial_state: StateWithAllPositions[S, M],
         move_limit: int,
         /,
         is_doing_triumph: bool,
         last_position_touched: str | None = None,
-        ) -> tuple[list[M], str]:
+        ) -> StateWithAllPositions[S, M]:
     """
     Makes moves from initial state until one of the next state will be completed.
     The number of moves are limited by argument ``move_limit``.
@@ -73,7 +92,7 @@ def solve_state[S, M](
         states = list(chain.from_iterable(s.make_all_moves(is_doing_triumph) for s in states))
         for s in states:
             if s.is_done and (not is_doing_triumph or last_position_touched != s.first_position):
-                return list(s.moves_made), s.last_position
+                return s
     else:
         raise ValueError(
             f'cannot solve encounter with initial {initial_state} '

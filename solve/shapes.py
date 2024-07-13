@@ -57,6 +57,12 @@ circle = Shape2D('circle')
 triangle = Shape2D('triangle')
 square = Shape2D('square')
 
+shape2opposite = {
+    circle:   {triangle, square},
+    triangle: {circle, square},
+    square:   {circle, triangle},
+    }
+
 sphere = Shape3D('sphere', (circle, circle))
 pyramid = Shape3D('pyramid', (triangle, triangle))
 cube = Shape3D('cube', (square, square))
@@ -69,6 +75,7 @@ __all__ = (
     'Shape3D',
     'circle',
     'triangle',
+    'shape2opposite',
     'square',
     'sphere',
     'pyramid',
