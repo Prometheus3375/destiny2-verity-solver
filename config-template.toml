@@ -26,9 +26,9 @@ inner_shapes = [4, 0, 3]
 # Must be present.
 
 held_shapes = [
+    24,
     20,
     23,
-    24,
 ]
 # Numeric numbers of three 3D shapes
 # which are held by statues in the main room from left to right.
