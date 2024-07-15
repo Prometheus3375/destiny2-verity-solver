@@ -61,14 +61,14 @@ def define_parser() -> ArgumentParser:
 
     parser.add_argument(
         'encounter_part',
+        metavar='ENCOUNTER-PART',
         choices=EncounterParts,
         default=EncounterParts.BOTH,
         help='Specifies what encounter part to solve.\n'
-             '  - solo-rooms - the script prints solution only for solo rooms.\n'
-             '  - dissection - the script prints solution only for dissection.\n'
-             '  - both - the script prints solution for solo rooms, then for dissection.\n'
-             'Defaults to "both".'
-             '',
+             '  - "solo-rooms" - the script prints solution only for solo rooms.\n'
+             '  - "dissection" - the script prints solution only for dissection.\n'
+             '  - "both" - the script prints solution for solo rooms, then for dissection.\n'
+             'Defaults to "both".',
         )
 
     parser.add_argument(
@@ -90,7 +90,7 @@ def define_parser() -> ArgumentParser:
         '-c',
         '--config',
         default='config.toml',
-        help='Path to the configuration file with encounter settings. '
+        help='Path to the configuration file with the encounter settings. '
              'You can create one from file "config-template.toml". '
              'Defaults to "config.toml".',
         )
