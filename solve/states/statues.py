@@ -97,7 +97,7 @@ class StateOfAllStatues(StateWithAllPositions[StatueState, DissectMove]):
                         s1.position:  new_s1,
                         s2.position:  new_s2,
                         s3.position:  s3,
-                        'moves_made': (*self.moves_made, move1, move2)
+                        'moves_made': (*self.moves_made, move1, move2),
                         }
                     yield StateOfAllStatues(**kwargs)
 
