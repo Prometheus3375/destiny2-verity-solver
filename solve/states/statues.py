@@ -1,10 +1,11 @@
 from collections import Counter
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterator
 from dataclasses import dataclass
 from itertools import chain, permutations, product
 from typing import Self, TypedDict, Unpack
 
 from .base import *
+from ..multiset import Multiset
 from ..shapes import *
 
 
@@ -23,20 +24,16 @@ class StatueState(State):
             position: PositionsType,
             own_shape: Shape2D,
             shape_held: Shape3D,
-            shapes_to_give: Iterable[Shape2D] | None = None,
-            shapes_to_receive: Iterable[Shape2D] | None = None,
+            shapes_to_give: Multiset[Shape2D] | None = None,
+            shapes_to_receive: Multiset[Shape2D] | None = None,
             ) -> None:
         self.shape_held = shape_held
 
         if shapes_to_give is None:
-            shapes_to_give = (
-                shape
-                for shape in shape_held.terms
-                if shape not in shape2opposite[own_shape]
-                )
+            shapes_to_give = shape_held.terms - shape2opposite[own_shape]
 
         if shapes_to_receive is None:
-            shapes_to_receive = shape2opposite[own_shape].difference(self.shape_held.terms)
+            shapes_to_receive = shape2opposite[own_shape] - shape_held.terms
 
         super().__init__(
             position=position,
@@ -55,29 +52,19 @@ class StatueState(State):
         Dissects this statue with one shape and other statue with other shape
         swapping dissected shapes in affected statues.
         """
-        self_to_give = list(self.shapes_to_give)
-        self_to_give.remove(shape1)
-        self_to_receive = set(self.shapes_to_receive)
-        self_to_receive.remove(shape2)
-
-        other_to_give = list(other.shapes_to_give)
-        other_to_give.remove(shape2)
-        other_to_receive = set(other.shapes_to_receive)
-        other_to_receive.remove(shape1)
-
         new_self = StatueState(
             self.position,
             self.own_shape,
             self.shape_held - shape1 + shape2,
-            shapes_to_give=self_to_give,
-            shapes_to_receive=self_to_receive,
+            shapes_to_give=self.shapes_to_give.remove_copy(shape1),
+            shapes_to_receive=self.shapes_to_receive.remove_copy(shape2),
             )
         new_other = StatueState(
             other.position,
             other.own_shape,
             other.shape_held - shape2 + shape1,
-            shapes_to_give=other_to_give,
-            shapes_to_receive=other_to_receive,
+            shapes_to_give=other.shapes_to_give.remove_copy(shape2),
+            shapes_to_receive=other.shapes_to_receive.remove_copy(shape1),
             )
 
         return new_self, new_other
@@ -135,7 +122,7 @@ def init_statues(**kw: Unpack[InitStatuesKwargs]) -> StateOfAllStatues:
 
     c1 = Counter(inner)
     assert all(v == 1 for v in c1.values()), f'the number of all inner shapes must be 1, got {c1}'
-    c2 = Counter(chain.from_iterable(s.terms for s in held))
+    c2 = Counter(chain.from_iterable(s.terms.elements() for s in held))
     assert all(v == 2 for v in c2.values()), \
         f'the number of all 2D terms of held 3D shapes must be 2, got {c2}'
 

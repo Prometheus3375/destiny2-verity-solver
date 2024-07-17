@@ -1,8 +1,9 @@
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterator
 from inspect import signature
 from typing import Literal, Protocol, Self, TypeGuard
 
-from solve.shapes import Shape2D
+from ..multiset import Multiset
+from ..shapes import Shape2D
 
 LEFT: Literal['left'] = 'left'
 MIDDLE: Literal['middle'] = 'middle'
@@ -45,15 +46,15 @@ class State:
             /,
             position: PositionsType,
             own_shape: Shape2D,
-            shapes_to_give: Iterable[Shape2D],
-            shapes_to_receive: Iterable[Shape2D],
+            shapes_to_give: Multiset[Shape2D],
+            shapes_to_receive: Multiset[Shape2D],
             ) -> None:
         assert is_position(position), \
             f'position of a state must be {_POSITIONS_MSG}, got {position!r}'
         self.position = position
         self.own_shape = own_shape
-        self.shapes_to_give = tuple(shapes_to_give)
-        self.shapes_to_receive = frozenset(shapes_to_receive)
+        self.shapes_to_give = shapes_to_give
+        self.shapes_to_receive = shapes_to_receive
 
     @property
     def is_done(self, /) -> bool:
@@ -63,7 +64,7 @@ class State:
         raise NotImplementedError
 
     @property
-    def shapes_available(self, /) -> tuple[Shape2D, ...]:
+    def shapes_available(self, /) -> Multiset[Shape2D]:
         """
         List of shapes available in this state.
         """

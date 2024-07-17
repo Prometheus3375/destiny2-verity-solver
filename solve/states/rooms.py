@@ -1,10 +1,11 @@
 from collections import Counter
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterator
 from dataclasses import dataclass
 from itertools import permutations
 from typing import Self, TypedDict, Unpack
 
 from .base import *
+from ..multiset import Multiset
 from ..shapes import *
 
 
@@ -23,11 +24,11 @@ class RoomState(State):
             /,
             position: PositionsType,
             own_shape: Shape2D,
-            dropping_shapes: Iterable[Shape2D],
-            shapes_to_give: Iterable[Shape2D] | None = None,
-            shapes_to_receive: Iterable[Shape2D] | None = None,
+            dropping_shapes: Multiset[Shape2D],
+            shapes_to_give: Multiset[Shape2D] | None = None,
+            shapes_to_receive: Multiset[Shape2D] | None = None,
             ) -> None:
-        self.dropping_shapes: tuple[Shape2D, ...] = tuple(dropping_shapes)
+        self.dropping_shapes = dropping_shapes
         shapes_to_give = self.dropping_shapes if shapes_to_give is None else shapes_to_give
         shapes_to_receive = (
             shape2opposite[own_shape] if shapes_to_receive is None
@@ -57,27 +58,19 @@ class RoomState(State):
         Transfers a shape from this room to the other.
         Returns two new room states, new self state and new other state.
         """
-        new_dropping = list(self.dropping_shapes)
-        new_dropping.remove(shape)
-        new_give = list(self.shapes_to_give)
-        new_give.remove(shape)
-
-        new_receive = set(other.shapes_to_receive)
-        new_receive.remove(shape)
-
         new_self = RoomState(
             self.position,
             self.own_shape,
-            new_dropping,
-            new_give,
-            self.shapes_to_receive,
+            dropping_shapes=self.dropping_shapes.remove_copy(shape),
+            shapes_to_give=self.shapes_to_give.remove_copy(shape),
+            shapes_to_receive=self.shapes_to_receive,
             )
         new_other = RoomState(
             other.position,
             other.own_shape,
-            (*other.dropping_shapes, shape),
-            other.shapes_to_give,
-            new_receive,
+            dropping_shapes=other.dropping_shapes.add_copy(shape),
+            shapes_to_give=other.shapes_to_give,
+            shapes_to_receive=other.shapes_to_receive.remove_copy(shape),
             )
         return new_self, new_other
 
@@ -134,17 +127,17 @@ def init_rooms(**kw: Unpack[InitRoomsKwargs]) -> StateOfAllRooms:
         left=RoomState(
             LEFT,
             kw['left_inner_shape'],
-            (kw['left_inner_shape'], kw['left_other_shape']),
+            Multiset((kw['left_inner_shape'], kw['left_other_shape'])),
             ),
         middle=RoomState(
             MIDDLE,
             kw['middle_inner_shape'],
-            (kw['middle_inner_shape'], kw['middle_other_shape']),
+            Multiset((kw['middle_inner_shape'], kw['middle_other_shape'])),
             ),
         right=RoomState(
             RIGHT,
             kw['right_inner_shape'],
-            (kw['right_inner_shape'], kw['right_other_shape']),
+            Multiset((kw['right_inner_shape'], kw['right_other_shape'])),
             ),
         )
 
