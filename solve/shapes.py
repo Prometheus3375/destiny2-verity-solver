@@ -65,18 +65,18 @@ circle = Shape2D('circle')
 triangle = Shape2D('triangle')
 square = Shape2D('square')
 
-shape2opposite = {
-    circle:   {triangle, square},
-    triangle: {circle, square},
-    square:   {circle, triangle},
-    }
-
 sphere = Shape3D('sphere', circle, circle)
 pyramid = Shape3D('pyramid', triangle, triangle)
 cube = Shape3D('cube', square, square)
 cone = Shape3D('cone', circle, triangle)
 cylinder = Shape3D('cylinder', circle, square)
 prism = Shape3D('prism', triangle, square)
+
+shape2opposite = {
+    circle:   prism.terms,
+    triangle: cylinder.terms,
+    square:   cone.terms,
+    }
 
 __all__ = (
     'Shape2D',
