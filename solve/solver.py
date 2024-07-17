@@ -8,7 +8,7 @@ def solve_state[S, M](
         last_position_touched: str | None = None,
         ) -> StateWithAllPositions[S, M]:
     """
-    Makes moves stating from the given initial state until one of the states is completed.
+    Makes moves starting from the given initial state until one of the next states is done.
     """
     if initial_state.is_done: return initial_state
 
