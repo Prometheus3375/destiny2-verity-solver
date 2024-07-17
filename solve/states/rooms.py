@@ -41,17 +41,17 @@ class RoomState(State):
             shapes_to_receive=shapes_to_receive,
             )
 
-    @property
-    def is_done(self, /) -> bool:
-        """
-        Whether this room contains exactly 2 different opposite shapes
-        and none of dropping shapes must be given.
-        """
-        return (
-                not self.shapes_to_give
-                and len(drops := set(self.dropping_shapes)) == 2
-                and drops == shape2opposite[self.own_shape]
-        )
+    # @property
+    # def is_done(self, /) -> bool:
+    #     """
+    #     Whether this room contains exactly 2 different opposite shapes
+    #     and none of dropping shapes must be given.
+    #     """
+    #     return (
+    #             not self.shapes_to_give
+    #             and len(drops := set(self.dropping_shapes)) == 2
+    #             and drops == shape2opposite[self.own_shape]
+    #     )
 
     def pass_shape(self, shape: Shape2D, other: Self, /) -> [Self, Self]:
         """

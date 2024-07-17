@@ -42,10 +42,10 @@ class StatueState(State):
             shapes_to_receive=shapes_to_receive,
             )
 
-    @property
-    def is_done(self, /) -> bool:
-        t1, t2 = shape2opposite[self.own_shape]
-        return self.shape_held == t1 + t2
+    # @property
+    # def is_done(self, /) -> bool:
+    #     t1, t2 = shape2opposite[self.own_shape]
+    #     return self.shape_held == t1 + t2
 
     def dissect(self, shape1: Shape2D, other: Self, shape2: Shape2D, /) -> [Self, Self]:
         """

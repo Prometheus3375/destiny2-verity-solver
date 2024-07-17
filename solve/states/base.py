@@ -61,7 +61,7 @@ class State:
         """
         Whether this state is done.
         """
-        raise NotImplementedError
+        return len(self.shapes_to_give) == 0 and len(self.shapes_to_receive) == 0
 
     @property
     def shapes_available(self, /) -> Multiset[Shape2D]:
