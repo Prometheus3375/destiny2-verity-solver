@@ -73,6 +73,8 @@ class StatueState(State):
 class StateOfAllStatues(StateWithAllPositions[StatueState, DissectMove]):
     __slots__ = ()
 
+    max_cycles = 3
+
     def next_states(self, /, is_doing_triumph: bool) -> Iterator[Self]:
         """
         Yields all possible next states.

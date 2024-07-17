@@ -95,6 +95,11 @@ class StateWithAllPositions[S: State, M: PMove]:
     """
     __slots__ = 'left', 'middle', 'right', 'moves_made'
 
+    max_cycles: int
+    """
+    The maximum number of cycles to solve states of this type.
+    """
+
     def __init__(self, /, left: S, middle: S, right: S, moves_made: tuple[M, ...] = ()) -> None:
         self.left = left
         self.middle = middle
