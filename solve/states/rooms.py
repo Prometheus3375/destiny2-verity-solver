@@ -78,7 +78,7 @@ class RoomState(State):
 class StateOfAllRooms(StateWithAllPositions[RoomState, PassMove]):
     __slots__ = ()
 
-    def make_all_moves(self, /, is_doing_triumph: bool) -> Iterator[Self]:
+    def next_states(self, /, is_doing_triumph: bool) -> Iterator[Self]:
         """
         Yields all possible next states.
         If argument ``is_doing_triumph`` is ``True``,

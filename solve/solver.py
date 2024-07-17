@@ -45,7 +45,7 @@ def solve_state[S, M](
     """
     states = [initial_state]
     for _ in range(move_limit):
-        states = list(chain.from_iterable(s.make_all_moves(is_doing_triumph) for s in states))
+        states = list(chain.from_iterable(s.next_states(is_doing_triumph) for s in states))
         for s in states:
             if s.is_done and (not is_doing_triumph or last_position_touched != s.first_position):
                 return s

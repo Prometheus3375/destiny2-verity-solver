@@ -136,7 +136,7 @@ class StateWithAllPositions[S: State, M: PMove]:
         """
         return self.moves_made[-1].destination
 
-    def make_all_moves(self, /, is_doing_triumph: bool) -> Iterator[Self]:
+    def next_states(self, /, is_doing_triumph: bool) -> Iterator[Self]:
         """
         Yields all possible next states.
         """
