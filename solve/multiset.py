@@ -257,7 +257,7 @@ class Multiset[T]:
             new = self.__class__()
             counter = new._counter
             for e in self._counter.keys() | other:
-                counts = self._counter[e], 1 if e in other else 0
+                counts = self._counter[e], e in other
                 count = max(counts) - min(counts)
                 if count > 0:
                     counter[e] = count
