@@ -36,6 +36,7 @@ class Multiset[T]:
     def __len__(self, /) -> int:
         return self._counter.__len__()
 
+    @property
     def total(self, /) -> int:
         """
         Returns the total number of elements in this multiset.
