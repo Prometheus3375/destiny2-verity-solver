@@ -25,7 +25,7 @@ def print_pass_moves(
     print(
         '--- SOLO ROOMS ARE DONE ---\n'
         'All player in the solo rooms must collect two shapes and wait\n'
-        'Proceed with dissection\n\n'
+        'Proceed with dissection\n'
         '--- LAST POSITION ---\n'
         f'{moves[-1].destination}'
         )
@@ -44,7 +44,7 @@ def print_dissect_moves(moves: Sequence[DissectMove], /, interactive: bool) -> N
 
     print(
         '--- DISSECTION IS DONE ---\n'
-        'All players in the solo rooms must leave them\n\n'
+        'All players in the solo rooms must leave them\n'
         '--- LAST POSITION ---\n'
         f'{moves[-1].destination}'
         )
