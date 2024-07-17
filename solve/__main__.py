@@ -5,7 +5,7 @@ from typing import assert_never
 import solve
 from .config import read_config
 from .printer import *
-from .solver import solve_rooms, solve_statues
+from .solver import solve_state
 
 
 class EncounterParts(StrEnum):
@@ -39,7 +39,7 @@ def main(
     last_position = config.last_position
     if do_rooms:
         room_state, aliases = config.init_rooms()
-        moves = solve_rooms(room_state, with_triumph, last_position)
+        moves = solve_state(room_state, with_triumph, last_position).moves_made
         print_pass_moves(aliases, moves, interactive)
         last_position = moves[-1].destination
 
@@ -47,7 +47,7 @@ def main(
         if do_rooms: print('\n')
 
         statue_state = config.init_statues()
-        moves = solve_statues(statue_state, with_triumph, last_position)
+        moves = solve_state(statue_state, with_triumph, last_position).moves_made
         print_dissect_moves(moves, interactive)
 
 

@@ -1,9 +1,11 @@
+from collections.abc import Sequence
+
 from .states import DissectMove, PassMove, PositionsType
 
 
 def print_pass_moves(
         aliases: dict[PositionsType, str],
-        moves: list[PassMove],
+        moves: Sequence[PassMove],
         /,
         interactive: bool,
         ) -> None:
@@ -29,7 +31,7 @@ def print_pass_moves(
         )
 
 
-def print_dissect_moves(moves: list[DissectMove], /, interactive: bool) -> None:
+def print_dissect_moves(moves: Sequence[DissectMove], /, interactive: bool) -> None:
     """
     Prints dissect moves to the console.
     If ``interactive`` is ``True``, prompts the user before continuing.
