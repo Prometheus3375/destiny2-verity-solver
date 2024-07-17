@@ -1,4 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import InitVar, dataclass, field
+
+from .multiset import Multiset
 
 
 @dataclass(frozen=True, slots=True)
@@ -25,25 +27,29 @@ class Shape2D(Shape):
 
 @dataclass(repr=False, eq=False, frozen=True, slots=True)
 class Shape3D(Shape):
-    terms: tuple[Shape2D, Shape2D]
+    term1: InitVar[Shape2D]
+    term2: InitVar[Shape2D]
+    terms: Multiset[Shape2D] = field(init=False)
 
     # noinspection PyDataclass
-    def __post_init__(self, /) -> None:
-        t1 = self.terms
-        t2 = self.terms[1], self.terms[0]
+    def __post_init__(self, term1: Shape2D, term2: Shape2D, /) -> None:
+        t1 = term1, term2
+        t2 = term2, term1
         if t1 in _addition or t2 in _addition:
             raise ValueError(f'cannot add addition operation for {self.name}')
 
         _addition[t1] = _addition[t2] = self
 
-        t3 = self, self.terms[0]
-        t4 = self, self.terms[1]
+        t3 = self, term1
+        t4 = self, term2
 
         if t3 in _subtraction or t4 in _subtraction:
             raise ValueError(f'cannot add subtraction operation for {self.name}')
 
-        _subtraction[t3] = self.terms[1]
-        _subtraction[t4] = self.terms[0]
+        _subtraction[t3] = term2
+        _subtraction[t4] = term1
+
+        self.terms = Multiset(t1)
 
     def __sub__(self, other: Shape2D, /) -> Shape2D:
         result = _subtraction.get((self, other))
@@ -65,12 +71,12 @@ shape2opposite = {
     square:   {circle, triangle},
     }
 
-sphere = Shape3D('sphere', (circle, circle))
-pyramid = Shape3D('pyramid', (triangle, triangle))
-cube = Shape3D('cube', (square, square))
-cone = Shape3D('cone', (circle, triangle))
-cylinder = Shape3D('cylinder', (circle, square))
-prism = Shape3D('prism', (triangle, square))
+sphere = Shape3D('sphere', circle, circle)
+pyramid = Shape3D('pyramid', triangle, triangle)
+cube = Shape3D('cube', square, square)
+cone = Shape3D('cone', circle, triangle)
+cylinder = Shape3D('cylinder', circle, square)
+prism = Shape3D('prism', triangle, square)
 
 __all__ = (
     'Shape2D',
