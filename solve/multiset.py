@@ -45,6 +45,14 @@ class Multiset[T]:
     def __hash__(self, /) -> int:
         return hash(frozenset(self._counter))
 
+    def __repr__(self, /) -> str:
+        if self._counter:
+            return f'{{{', '.join(repr(e) for e in self.elements())}}}'
+
+        return f'{self.__class__.__name__}()'
+
+    __str__ = __repr__
+
     def copy(self, /) -> Self:
         """
         Makes a shallow copy of this set.
