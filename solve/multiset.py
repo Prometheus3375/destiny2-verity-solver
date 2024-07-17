@@ -266,6 +266,8 @@ class Multiset[T]:
 
         return NotImplemented
 
+    __rxor__ = __xor__
+
     # endregion
 
 
