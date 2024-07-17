@@ -39,7 +39,7 @@ class State:
     """
     Base class for any state.
     """
-    __slots__ = 'position', 'own_shape', 'shapes_to_give', 'shapes_to_receive'
+    __slots__ = 'position', 'own_shape', '_shapes_to_give', '_shapes_to_receive'
 
     def __init__(
             self,
@@ -53,28 +53,28 @@ class State:
             f'position of a state must be {_POSITIONS_MSG}, got {position!r}'
         self.position = position
         self.own_shape = own_shape
-        self.shapes_to_give = shapes_to_give
-        self.shapes_to_receive = shapes_to_receive
+        self._shapes_to_give = shapes_to_give
+        self._shapes_to_receive = shapes_to_receive
 
     @property
     def is_done(self, /) -> bool:
         """
         Whether this state is done.
         """
-        return len(self.shapes_to_give) == 0 and len(self.shapes_to_receive) == 0
+        return len(self._shapes_to_give) == 0 and len(self._shapes_to_receive) == 0
 
     @property
-    def shapes_available(self, /) -> Multiset[Shape2D]:
+    def shapes_to_give(self, /) -> Multiset[Shape2D]:
         """
-        List of shapes available in this state.
+        The multiset of shapes which should be given to other states.
         """
-        return self.shapes_to_give
+        return self._shapes_to_give
 
     def is_shape_required(self, shape: Shape2D, /) -> bool:
         """
-        Return ``True`` if to be done this state requires passed shape.
+        Return ``True`` if the given shape is required for this state to be done.
         """
-        return shape in self.shapes_to_receive
+        return shape in self._shapes_to_receive
 
     def __repr__(self, /) -> str:
         attrs = ', '.join(f'{attr}={getattr(self, attr)}' for attr in self.__slots__)
@@ -82,8 +82,8 @@ class State:
             f'{self.__class__.__name__}('
             f'{self.position.upper()}, '
             f'own_shape={self.own_shape}, '
-            f'shapes_to_give={self.shapes_to_give}, '
-            f'shapes_to_receive={self.shapes_to_receive}, '
+            f'shapes_to_give={self._shapes_to_give}, '
+            f'shapes_to_receive={self._shapes_to_receive}, '
             f'{attrs}'
             f')'
         )

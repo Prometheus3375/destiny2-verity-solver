@@ -56,15 +56,15 @@ class StatueState(State):
             self.position,
             self.own_shape,
             self.shape_held - shape1 + shape2,
-            shapes_to_give=self.shapes_to_give.remove_copy(shape1),
-            shapes_to_receive=self.shapes_to_receive.remove_copy(shape2),
+            shapes_to_give=self._shapes_to_give.remove_copy(shape1),
+            shapes_to_receive=self._shapes_to_receive.remove_copy(shape2),
             )
         new_other = StatueState(
             other.position,
             other.own_shape,
             other.shape_held - shape2 + shape1,
-            shapes_to_give=other.shapes_to_give.remove_copy(shape2),
-            shapes_to_receive=other.shapes_to_receive.remove_copy(shape1),
+            shapes_to_give=other._shapes_to_give.remove_copy(shape2),
+            shapes_to_receive=other._shapes_to_receive.remove_copy(shape1),
             )
 
         return new_self, new_other
@@ -86,7 +86,7 @@ class StateOfAllStatues(StateWithAllPositions[StatueState, DissectMove]):
             # Do nothing if either state is done.
             if s1.is_done or s2.is_done: continue
 
-            for shape1, shape2 in product(s1.shapes_available, s2.shapes_available):
+            for shape1, shape2 in product(s1.shapes_to_give, s2.shapes_to_give):
                 if s2.is_shape_required(shape1) and s1.is_shape_required(shape2):
                     new_s1, new_s2 = s1.dissect(shape1, s2, shape2)
                     move1 = DissectMove(shape=shape1, destination=s1.position)

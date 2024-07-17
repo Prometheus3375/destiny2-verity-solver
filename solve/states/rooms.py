@@ -62,15 +62,15 @@ class RoomState(State):
             self.position,
             self.own_shape,
             dropping_shapes=self.dropping_shapes.remove_copy(shape),
-            shapes_to_give=self.shapes_to_give.remove_copy(shape),
-            shapes_to_receive=self.shapes_to_receive,
+            shapes_to_give=self._shapes_to_give.remove_copy(shape),
+            shapes_to_receive=self._shapes_to_receive,
             )
         new_other = RoomState(
             other.position,
             other.own_shape,
             dropping_shapes=other.dropping_shapes.add_copy(shape),
-            shapes_to_give=other.shapes_to_give,
-            shapes_to_receive=other.shapes_to_receive.remove_copy(shape),
+            shapes_to_give=other._shapes_to_give,
+            shapes_to_receive=other._shapes_to_receive.remove_copy(shape),
             )
         return new_self, new_other
 
@@ -91,7 +91,7 @@ class StateOfAllRooms(StateWithAllPositions[RoomState, PassMove]):
             # Do nothing if either state is done.
             if s1.is_done or s2.is_done: continue
 
-            for shape in s1.shapes_available:
+            for shape in s1.shapes_to_give:
                 if s2.is_shape_required(shape):
                     new_s1, new_s2 = s1.pass_shape(shape, s2)
                     move = PassMove(departure=s1.position, shape=shape, destination=s2.position)
