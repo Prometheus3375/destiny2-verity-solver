@@ -49,7 +49,7 @@ class Shape3D(Shape):
         _subtraction[t3] = term2
         _subtraction[t4] = term1
 
-        self.terms = Multiset(t1)
+        object.__setattr__(self, 'terms', Multiset(t1))
 
     def __sub__(self, other: Shape2D, /) -> Shape2D:
         result = _subtraction.get((self, other))
