@@ -40,6 +40,30 @@ class State:
     Base class for any state.
     """
     __slots__ = 'position', 'own_shape', '_shapes_to_give', '_shapes_to_receive'
+    def __init_subclass__(cls, /) -> None:
+        cls.__all_slots__ = slots = frozenset(
+            slot
+            for klass in cls.mro()
+            for slot in klass.__dict__.get('__slots__') or ()
+            )
+
+        parameters = dict(signature(cls).parameters)
+        if not (slots >= parameters.keys()):
+            raise TypeError(
+                f'slots of class {cls.__name__!r} must include '
+                f'parameters of its constructor'
+                )
+
+        cls.__positional_slots__ = tuple(
+            name
+            for name, p in parameters.items()
+            if p.kind == p.POSITIONAL_ONLY
+            )
+        cls.__keyword_slots__ = tuple(
+            name
+            for name, p in parameters.items()
+            if p.kind == p.POSITIONAL_OR_KEYWORD or p.kind == p.KEYWORD_ONLY
+            )
 
     def __init__(
             self,
@@ -77,16 +101,10 @@ class State:
         return shape in self._shapes_to_receive
 
     def __repr__(self, /) -> str:
-        attrs = ', '.join(f'{attr}={getattr(self, attr)}' for attr in self.__slots__)
-        return (
-            f'{self.__class__.__name__}('
-            f'{self.position.upper()}, '
-            f'own_shape={self.own_shape}, '
-            f'shapes_to_give={self._shapes_to_give}, '
-            f'shapes_to_receive={self._shapes_to_receive}, '
-            f'{attrs}'
-            f')'
-        )
+        positional = ', '.join(f'{getattr(self, attr)!r}' for attr in self.__positional_slots__)
+        keyword = ', '.join(f'{attr}={getattr(self, attr)!r}' for attr in self.__keyword_slots__)
+        args = ', '.join((positional, keyword))
+        return f'{self.__class__.__name__}({args})'
 
 
 class StateWithAllPositions[S: State, M: PMove]:
@@ -106,14 +124,14 @@ class StateWithAllPositions[S: State, M: PMove]:
         self.right = right
         self.moves_made = moves_made
 
-    # region Verify that constructor and slots has POSITIONS
+    # region Verify that constructor and slots have POSITIONS
     assert set(__slots__) >= _POSITIONS, f'encounter state must have position attributes'
 
     signature_ = signature(__init__)
     kwargs = {
         p.name
         for p in signature_.parameters.values()
-        if p.kind is p.KEYWORD_ONLY or p.kind is p.POSITIONAL_OR_KEYWORD
+        if p.kind == p.KEYWORD_ONLY or p.kind == p.POSITIONAL_OR_KEYWORD
         }
 
     assert kwargs >= _POSITIONS, f'encounter state must have position keyword arguments'
