@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from .players import *
 from .shapes import *
 from .states import *
+from .key_sets import KeySetType
 
 number2shape = {
     0:  circle,
@@ -32,14 +33,17 @@ class Config:
     is_doing_triumph: bool
     last_position: PositionsType | None
 
-    def init_rooms(self, /) -> tuple[StateOfAllRooms, dict[PositionsType, str]]:
+    def init_rooms(
+            self,
+            key_set: KeySetType,
+            /,
+            ) -> tuple[StateOfAllRooms, AliasMappingType]:
         """
-        Creates the initial state of all solo rooms using this config
-        with a mapping of positions to player aliases.
+        Creates the initial state of all solo rooms using this config.
         """
-        return init_rooms_from_players(self.players, self.inner_shapes)
+        return init_rooms_from_players(self.players, self.inner_shapes, key_set)
 
-    def init_statues(self, /) -> StateOfAllStatues:
+    def init_statues(self, key_set: KeySetType, /) -> StateOfAllStatues:
         """
         Creates the initial state of all statues in the main room using this config.
         """
@@ -50,6 +54,7 @@ class Config:
             middle_held_shape=self.held_shapes[1],
             right_inner_shape=self.inner_shapes[2],
             right_held_shape=self.held_shapes[2],
+            key_set=key_set,
             )
 
 
