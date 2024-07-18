@@ -88,8 +88,8 @@ class StateOfAllStatues(StateWithAllPositions[StatueState, DissectMove]):
             # Do nothing if either state is done.
             if s1.is_done or s2.is_done: continue
 
-            for shape1, shape2 in product(s1.shapes_to_give, s2.shapes_to_give):
                 if s2.is_shape_required(shape1) and s1.is_shape_required(shape2):
+            for shape1, shape2 in product(s1.shapes_available, s2.shapes_available):
                     new_s1, new_s2 = s1.dissect(shape1, s2, shape2)
                     move1 = DissectMove(shape=shape1, destination=s1.position)
                     move2 = DissectMove(shape=shape2, destination=s2.position)

@@ -39,7 +39,8 @@ class State:
     """
     Base class for any state.
     """
-    __slots__ = 'position', 'own_shape', '_shapes_to_give', '_shapes_to_receive'
+    __slots__ = 'position', 'own_shape', 'shapes_to_receive'
+
     def __init_subclass__(cls, /) -> None:
         cls.__all_slots__ = slots = frozenset(
             slot
@@ -68,37 +69,36 @@ class State:
     def __init__(
             self,
             /,
+            *,
             position: PositionsType,
             own_shape: Shape2D,
-            shapes_to_give: Multiset[Shape2D],
             shapes_to_receive: Multiset[Shape2D],
             ) -> None:
         assert is_position(position), \
             f'position of a state must be {_POSITIONS_MSG}, got {position!r}'
         self.position = position
         self.own_shape = own_shape
-        self._shapes_to_give = shapes_to_give
-        self._shapes_to_receive = shapes_to_receive
+        self.shapes_to_receive = shapes_to_receive
 
     @property
     def is_done(self, /) -> bool:
         """
         Whether this state is done.
         """
-        return len(self._shapes_to_give) == 0 and len(self._shapes_to_receive) == 0
+        raise NotImplementedError
 
     @property
-    def shapes_to_give(self, /) -> Multiset[Shape2D]:
+    def shapes_available(self, /) -> Multiset[Shape2D]:
         """
-        The multiset of shapes which should be given to other states.
+        The multiset of shapes which are present in this state.
         """
-        return self._shapes_to_give
+        raise NotImplementedError
 
     def is_shape_required(self, shape: Shape2D, /) -> bool:
         """
         Return ``True`` if the given shape is required for this state to be done.
         """
-        return shape in self._shapes_to_receive
+        return shape in self.shapes_to_receive
 
     def __repr__(self, /) -> str:
         positional = ', '.join(f'{getattr(self, attr)!r}' for attr in self.__positional_slots__)

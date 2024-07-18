@@ -93,7 +93,7 @@ class StateOfAllRooms(StateWithAllPositions[RoomState, PassMove]):
             # Do nothing if either state is done.
             if s1.is_done or s2.is_done: continue
 
-            for shape in s1.shapes_to_give:
+            for shape in s1.shapes_available:
                 if s2.is_shape_required(shape):
                     new_s1, new_s2 = s1.pass_shape(shape, s2)
                     move = PassMove(departure=s1.position, shape=shape, destination=s2.position)
