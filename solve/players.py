@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 from solve.shapes import Shape2D
@@ -12,11 +12,14 @@ class Player:
     other_shape: Shape2D
 
 
+type AliasMappingType = Mapping[PositionsType, str]
+
+
 def init_rooms_from_players(
         players: Sequence[Player],
         inner_shapes: Sequence[Shape2D],
         /,
-        ) -> tuple[StateOfAllRooms, dict[PositionsType, str]]:
+        ) -> tuple[StateOfAllRooms, AliasMappingType]:
     """
     Takes three players in solo rooms and 2D shapes of statues there in order from left to right.
     Returns initial state of solo rooms a mapping of positions to player aliases.
@@ -42,4 +45,4 @@ def init_rooms_from_players(
     return state, aliases
 
 
-__all__ = 'Player', 'init_rooms_from_players'
+__all__ = 'Player', 'AliasMappingType', 'init_rooms_from_players'
