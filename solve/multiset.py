@@ -1,7 +1,7 @@
 from collections import Counter
 from collections.abc import Iterable, Iterator, Set
 from itertools import product
-from typing import Self
+from typing import Any, Self
 
 
 @Set.register
@@ -106,7 +106,7 @@ class Multiset[T]:
 
         return True
 
-    def __eq__(self, other: Set[T], /) -> bool:
+    def __eq__(self, other: Any, /) -> bool:
         if isinstance(other, self.__class__):
             return self._counter == other._counter
 
@@ -115,7 +115,7 @@ class Multiset[T]:
 
         return NotImplemented
 
-    def __ne__(self, other: Set[T], /) -> bool:
+    def __ne__(self, other: Any, /) -> bool:
         if isinstance(other, self.__class__):
             return self._counter != other._counter
 
