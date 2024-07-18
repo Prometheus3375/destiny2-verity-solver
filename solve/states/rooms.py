@@ -2,9 +2,10 @@ from collections import Counter
 from collections.abc import Iterator
 from dataclasses import dataclass
 from itertools import permutations
-from typing import Self, TypedDict, Unpack
+from typing import Self
 
 from .base import *
+from ..key_sets import KSMixed, KeySetType
 from ..multiset import Multiset
 from ..shapes import *
 
@@ -17,41 +18,50 @@ class PassMove:
 
 
 class RoomState(State):
-    __slots__ = 'dropping_shapes',
+    __slots__ = 'dropping_shapes', 'final_dropping_shapes'
 
     def __init__(
             self,
-            /,
             position: PositionsType,
             own_shape: Shape2D,
+            /,
+            *,
             dropping_shapes: Multiset[Shape2D],
-            shapes_to_give: Multiset[Shape2D] | None = None,
+            final_dropping_shapes: Multiset[Shape2D],
             shapes_to_receive: Multiset[Shape2D] | None = None,
             ) -> None:
         self.dropping_shapes = dropping_shapes
-        shapes_to_give = self.dropping_shapes if shapes_to_give is None else shapes_to_give
-        shapes_to_receive = (
-            shape2opposite[own_shape] if shapes_to_receive is None
-            else shapes_to_receive
-        )
+        self.final_dropping_shapes = final_dropping_shapes
+        # Shadow - 2D shape holding by a statue in a room.
+        # There are two shadows in each room.
+        # For example, circle room has triangle and square shadows.
+        # Each solo player must remove shadows to allow everyone to exit.
+        # To remove a shadow X, the room must receive shape X.
+        # For example, circle room must receive triangle and square to remove both shadows.
+        if shapes_to_receive is None:
+            # This rooms must receive KSMixed[own_shape].terms in any case.
+            # In addition, this room must receive any other shape from final_dropping_shapes
+            # unless it is already present in dropping_shapes.
+            # Take union (not sum!) between
+            # "must receive in any case" and "must receive to be done".
+            # Unions of multisets takes the highest count of elements instead of summing count,
+            # ex. {triangle, circle} | {triangle, triangle} = {triangle, circle, triangle}.
+            shapes_to_receive = KSMixed[own_shape].terms \
+                                | (final_dropping_shapes - dropping_shapes)
+
         super().__init__(
             position=position,
             own_shape=own_shape,
-            shapes_to_give=shapes_to_give,
             shapes_to_receive=shapes_to_receive,
             )
 
-    # @property
-    # def is_done(self, /) -> bool:
-    #     """
-    #     Whether this room contains exactly 2 different opposite shapes
-    #     and none of dropping shapes must be given.
-    #     """
-    #     return (
-    #             not self.shapes_to_give
-    #             and len(drops := set(self.dropping_shapes)) == 2
-    #             and drops == shape2opposite[self.own_shape]
-    #     )
+    @property
+    def is_done(self, /) -> bool:
+        return not self.shapes_to_receive and self.dropping_shapes == self.final_dropping_shapes
+
+    @property
+    def shapes_available(self, /) -> Multiset[Shape2D]:
+        return self.dropping_shapes
 
     def pass_shape(self, shape: Shape2D, other: Self, /) -> [Self, Self]:
         """
@@ -62,15 +72,15 @@ class RoomState(State):
             self.position,
             self.own_shape,
             dropping_shapes=self.dropping_shapes.remove_copy(shape),
-            shapes_to_give=self._shapes_to_give.remove_copy(shape),
-            shapes_to_receive=self._shapes_to_receive,
+            final_dropping_shapes=self.final_dropping_shapes,
+            shapes_to_receive=self.shapes_to_receive,
             )
         new_other = RoomState(
             other.position,
             other.own_shape,
             dropping_shapes=other.dropping_shapes.add_copy(shape),
-            shapes_to_give=other._shapes_to_give,
-            shapes_to_receive=other._shapes_to_receive.remove_copy(shape),
+            final_dropping_shapes=other.final_dropping_shapes,
+            shapes_to_receive=other.shapes_to_receive.remove_copy(shape),
             )
         return new_self, new_other
 
