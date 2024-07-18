@@ -2,9 +2,10 @@ from collections import Counter
 from collections.abc import Iterator
 from dataclasses import dataclass
 from itertools import chain, permutations, product
-from typing import Self, TypedDict, Unpack
+from typing import Self
 
 from .base import *
+from ..key_sets import KeySetType
 from ..multiset import Multiset
 from ..shapes import *
 
@@ -16,55 +17,58 @@ class DissectMove:
 
 
 class StatueState(State):
-    __slots__ = 'shape_held',
+    __slots__ = 'shape_held', 'final_shape_held'
 
     def __init__(
             self,
-            /,
             position: PositionsType,
             own_shape: Shape2D,
+            /,
+            *,
             shape_held: Shape3D,
-            shapes_to_give: Multiset[Shape2D] | None = None,
+            final_shape_held: Shape3D,
             shapes_to_receive: Multiset[Shape2D] | None = None,
             ) -> None:
         self.shape_held = shape_held
-
-        if shapes_to_give is None:
-            shapes_to_give = shape_held.terms - shape2opposite[own_shape]
+        self.final_shape_held = final_shape_held
 
         if shapes_to_receive is None:
-            shapes_to_receive = shape2opposite[own_shape] - shape_held.terms
+            shapes_to_receive = final_shape_held.terms
 
         super().__init__(
             position=position,
             own_shape=own_shape,
-            shapes_to_give=shapes_to_give,
             shapes_to_receive=shapes_to_receive,
             )
 
-    # @property
-    # def is_done(self, /) -> bool:
-    #     t1, t2 = shape2opposite[self.own_shape]
-    #     return self.shape_held == t1 + t2
+    @property
+    def is_done(self, /) -> bool:
+        return self.shape_held == self.final_shape_held
+
+    @property
+    def shapes_available(self, /) -> Multiset[Shape2D]:
+        return self.shape_held.terms
 
     def dissect(self, shape1: Shape2D, other: Self, shape2: Shape2D, /) -> [Self, Self]:
         """
         Dissects this statue with one shape and other statue with other shape
         swapping dissected shapes in affected statues.
         """
+        # Use discard, because one of the states is allowed
+        # to not require swapped shape.
         new_self = StatueState(
             self.position,
             self.own_shape,
-            self.shape_held - shape1 + shape2,
-            shapes_to_give=self._shapes_to_give.remove_copy(shape1),
-            shapes_to_receive=self._shapes_to_receive.remove_copy(shape2),
+            shape_held=self.shape_held - shape1 + shape2,
+            final_shape_held=self.final_shape_held,
+            shapes_to_receive=self.shapes_to_receive.discard_copy(shape2),
             )
         new_other = StatueState(
             other.position,
             other.own_shape,
-            other.shape_held - shape2 + shape1,
-            shapes_to_give=other._shapes_to_give.remove_copy(shape2),
-            shapes_to_receive=other._shapes_to_receive.remove_copy(shape1),
+            shape_held=other.shape_held - shape2 + shape1,
+            final_shape_held=other.final_shape_held,
+            shapes_to_receive=other.shapes_to_receive.discard_copy(shape1),
             )
 
         return new_self, new_other
@@ -88,8 +92,12 @@ class StateOfAllStatues(StateWithAllPositions[StatueState, DissectMove]):
             # Do nothing if either state is done.
             if s1.is_done or s2.is_done: continue
 
-                if s2.is_shape_required(shape1) and s1.is_shape_required(shape2):
             for shape1, shape2 in product(s1.shapes_available, s2.shapes_available):
+                # Only check for s1 with shape2 because
+                # players can start with all doubles
+                # and must finish with doubles in different statues.
+                # Condition for s2 with shape1 will be done in other permutation.
+                if s1.is_shape_required(shape2):
                     new_s1, new_s2 = s1.dissect(shape1, s2, shape2)
                     move1 = DissectMove(shape=shape1, destination=s1.position)
                     move2 = DissectMove(shape=shape2, destination=s2.position)
