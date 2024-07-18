@@ -116,20 +116,27 @@ class StateOfAllRooms(StateWithAllPositions[RoomState, PassMove]):
                     yield StateOfAllRooms(**kwargs)
 
 
-class InitRoomsKwargs(TypedDict):
-    left_inner_shape: Shape2D
-    left_other_shape: Shape2D
-    middle_inner_shape: Shape2D
-    middle_other_shape: Shape2D
-    right_inner_shape: Shape2D
-    right_other_shape: Shape2D
-
-
-def init_rooms(**kw: Unpack[InitRoomsKwargs]) -> StateOfAllRooms:
+def init_rooms(
+        *,
+        left_inner_shape: Shape2D,
+        left_other_shape: Shape2D,
+        middle_inner_shape: Shape2D,
+        middle_other_shape: Shape2D,
+        right_inner_shape: Shape2D,
+        right_other_shape: Shape2D,
+        key_set: KeySetType,
+        ) -> StateOfAllRooms:
     """
     A convenience function to specify the initial state of all solo rooms.
     """
-    shapes = kw.values()
+    shapes = (
+        left_inner_shape,
+        left_other_shape,
+        middle_inner_shape,
+        middle_other_shape,
+        right_inner_shape,
+        right_other_shape,
+        )
     assert all(isinstance(f, Shape2D) for f in shapes), f'all shapes must be 2D shapes'
 
     c = Counter(shapes)
@@ -138,20 +145,23 @@ def init_rooms(**kw: Unpack[InitRoomsKwargs]) -> StateOfAllRooms:
     return StateOfAllRooms(
         left=RoomState(
             LEFT,
-            kw['left_inner_shape'],
-            Multiset((kw['left_inner_shape'], kw['left_other_shape'])),
+            left_inner_shape,
+            dropping_shapes=Multiset((left_inner_shape, left_other_shape)),
+            final_dropping_shapes=key_set[left_inner_shape].terms,
             ),
         middle=RoomState(
             MIDDLE,
-            kw['middle_inner_shape'],
-            Multiset((kw['middle_inner_shape'], kw['middle_other_shape'])),
+            middle_inner_shape,
+            dropping_shapes=Multiset((middle_inner_shape, middle_other_shape)),
+            final_dropping_shapes=key_set[middle_inner_shape].terms,
             ),
         right=RoomState(
             RIGHT,
-            kw['right_inner_shape'],
-            Multiset((kw['right_inner_shape'], kw['right_other_shape'])),
+            right_inner_shape,
+            dropping_shapes=Multiset((right_inner_shape, right_other_shape)),
+            final_dropping_shapes=key_set[right_inner_shape].terms,
             ),
         )
 
 
-__all__ = 'PassMove', 'StateOfAllRooms', 'InitRoomsKwargs', 'init_rooms'
+__all__ = 'PassMove', 'StateOfAllRooms', 'init_rooms'

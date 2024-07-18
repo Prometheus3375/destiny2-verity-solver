@@ -110,22 +110,22 @@ class StateOfAllStatues(StateWithAllPositions[StatueState, DissectMove]):
                     yield StateOfAllStatues(**kwargs)
 
 
-class InitStatuesKwargs(TypedDict):
-    left_inner_shape: Shape2D
-    left_held_shape: Shape3D
-    middle_inner_shape: Shape2D
-    middle_held_shape: Shape3D
-    right_inner_shape: Shape2D
-    right_held_shape: Shape3D
-
-
-def init_statues(**kw: Unpack[InitStatuesKwargs]) -> StateOfAllStatues:
+def init_statues(
+        *,
+        left_inner_shape: Shape2D,
+        left_held_shape: Shape3D,
+        middle_inner_shape: Shape2D,
+        middle_held_shape: Shape3D,
+        right_inner_shape: Shape2D,
+        right_held_shape: Shape3D,
+        key_set: KeySetType,
+        ) -> StateOfAllStatues:
     """
     A convenience function to specify the initial state of all statues in the main room.
     """
-    inner = kw['left_inner_shape'], kw['middle_inner_shape'], kw['right_inner_shape']
+    inner = left_inner_shape, middle_inner_shape, right_inner_shape
     assert all(isinstance(s, Shape2D) for s in inner), f'all inner shapes must be 2D'
-    held = kw['left_held_shape'], kw['middle_held_shape'], kw['right_held_shape']
+    held = left_held_shape, middle_held_shape, right_held_shape
     assert all(isinstance(s, Shape3D) for s in held), f'all held shapes must be 3D'
     assert all(d2 in d3.terms for d2, d3 in zip(inner, held)), \
         f'every held shape must contain respective inner shape at least once'
@@ -137,10 +137,25 @@ def init_statues(**kw: Unpack[InitStatuesKwargs]) -> StateOfAllStatues:
         f'the number of all 2D terms of held 3D shapes must be 2, got {c2}'
 
     return StateOfAllStatues(
-        left=StatueState(LEFT, kw['left_inner_shape'], kw['left_held_shape']),
-        middle=StatueState(MIDDLE, kw['middle_inner_shape'], kw['middle_held_shape']),
-        right=StatueState(RIGHT, kw['right_inner_shape'], kw['right_held_shape']),
+        left=StatueState(
+            LEFT,
+            left_inner_shape,
+            shape_held=left_held_shape,
+            final_shape_held=key_set[left_inner_shape],
+            ),
+        middle=StatueState(
+            MIDDLE,
+            middle_inner_shape,
+            shape_held=middle_held_shape,
+            final_shape_held=key_set[middle_inner_shape],
+            ),
+        right=StatueState(
+            RIGHT,
+            right_inner_shape,
+            shape_held=right_held_shape,
+            final_shape_held=key_set[right_inner_shape],
+            ),
         )
 
 
-__all__ = 'DissectMove', 'StateOfAllStatues', 'InitStatuesKwargs', 'init_statues'
+__all__ = 'DissectMove', 'StateOfAllStatues', 'init_statues'
