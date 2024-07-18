@@ -88,7 +88,7 @@ class RoomState(State):
 class StateOfAllRooms(StateWithAllPositions[RoomState, PassMove]):
     __slots__ = ()
 
-    max_cycles = 6
+    max_cycles = 9
 
     def next_states(self, /, is_doing_triumph: bool) -> Iterator[Self]:
         """
