@@ -1,10 +1,12 @@
+from collections import defaultdict, deque
 from collections.abc import Sequence
 
-from .states import DissectMove, PassMove, PositionsType
+from .players import AliasMappingType
+from .states import DissectMove, PassMove
 
 
 def print_pass_moves(
-        aliases: dict[PositionsType, str],
+        aliases: AliasMappingType,
         moves: Sequence[PassMove],
         /,
         interactive: bool,
@@ -13,21 +15,13 @@ def print_pass_moves(
     Prints pass moves to the console.
     If ``interactive`` is ``True``, prompts the user before continuing.
     """
-    # Solo rooms must always be solvable in 6 passes.
-    # This assertion is required for correct filling of dicts
-    # initial_collect and final_collect.
-    assert len(moves) == 6, f'expected 6 moves for solo rooms, got {len(moves)}'
-    initial_collect = {}
-    final_collect = {}
+    position2collect = defaultdict(deque)
     for m in moves:
-        if m.departure in initial_collect:
-            final_collect[m.departure] = m.shape
-        else:
-            initial_collect[m.departure] = m.shape
+        position2collect[m.departure].appendleft(m.shape)
 
     initial_msg = ', '.join(
-        f'Player {aliases[position]} collects {shape}'
-        for position, shape in initial_collect.items()
+        f'Player {aliases[position]} collects {shapes.pop()}'
+        for position, shapes in position2collect.items()
         )
 
     print_move = input if interactive else print
@@ -38,9 +32,9 @@ def print_pass_moves(
             f'Player {aliases[m.departure]}: '
             f'pass {m.shape} to {m.destination}'
             )
-        shape = final_collect.pop(m.departure, None)
-        if shape:
-            print_move(f'Player {aliases[m.departure]}: collect {shape}')
+        shapes = position2collect[m.departure]
+        if shapes:
+            print_move(f'Player {aliases[m.departure]}: collect {shapes.pop()}')
 
     print(
         '--- SOLO ROOMS ARE DONE ---\n'
