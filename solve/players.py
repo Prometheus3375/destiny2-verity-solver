@@ -1,8 +1,9 @@
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
-from solve.shapes import Shape2D
-from solve.states import LEFT, MIDDLE, PositionsType, RIGHT, StateOfAllRooms, init_rooms
+from .key_sets import KeySetType
+from .shapes import Shape2D
+from .states import LEFT, MIDDLE, PositionsType, RIGHT, StateOfAllRooms, init_rooms
 
 
 @dataclass(frozen=True, kw_only=True, slots=True)
@@ -18,10 +19,13 @@ type AliasMappingType = Mapping[PositionsType, str]
 def init_rooms_from_players(
         players: Sequence[Player],
         inner_shapes: Sequence[Shape2D],
+        key_set: KeySetType,
         /,
         ) -> tuple[StateOfAllRooms, AliasMappingType]:
     """
-    Takes three players in solo rooms and 2D shapes of statues there in order from left to right.
+    Takes three players in solo rooms,
+    2D shapes of statues there in order from left to right,
+    and the current key set.
     Returns initial state of solo rooms a mapping of positions to player aliases.
     """
     assert len(players) == len(inner_shapes) == 3, f'number of players and shapes must be 3'
@@ -40,6 +44,7 @@ def init_rooms_from_players(
         middle_other_shape=other[1],
         right_inner_shape=inner_shapes[2],
         right_other_shape=other[2],
+        key_set=key_set,
         )
 
     return state, aliases
