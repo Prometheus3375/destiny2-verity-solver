@@ -10,8 +10,6 @@ def solve_state[S, M](
     """
     Makes moves starting from the given initial state until one of the next states is done.
     """
-    if initial_state.is_done: return initial_state
-
     # region First cycle
     if is_doing_triumph and last_position_touched:
         states = [
@@ -22,14 +20,9 @@ def solve_state[S, M](
     else:
         states = list(initial_state.next_states(is_doing_triumph))
 
-    for state in states:
-        if state.is_done:
-            return state
-
     # endregion
 
-    max_cycles = initial_state.max_cycles
-    for _ in range(max_cycles - 1):
+    for _ in range(initial_state.max_cycles - 1):
         states = [
             next_state
             for state in states
@@ -41,7 +34,7 @@ def solve_state[S, M](
     else:
         raise ValueError(
             f'cannot solve encounter with initial {initial_state} '
-            f'within {max_cycles} cycles'
+            f'within {initial_state.max_cycles} cycles'
             )
 
 
