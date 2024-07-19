@@ -2,7 +2,7 @@ import tomllib
 from dataclasses import dataclass
 from enum import Enum
 
-from .key_sets import *
+from .combo import Combination, Node
 from .players import *
 from .shapes import *
 from .states import *
@@ -39,29 +39,34 @@ class Config:
     is_doing_triumph: bool
     last_position: PositionsType | None
 
-    def init_rooms(
-            self,
-            key_set: KeySetType,
-            /,
-            ) -> tuple[StateOfAllRooms, AliasMappingType]:
+    def encounter_data(self, /) -> tuple[Combination, Combination, AliasMappingType]:
         """
-        Creates the initial state of all solo rooms using this config.
+        Extracts room combination, statue combination and alias mapping from this config.
         """
-        return init_rooms_from_players(self.players, self.inner_shapes, key_set)
+        inner = self.inner_shapes
+        inner2person = {
+            i: p
+            for i in inner
+            for p in self.players
+            if p.their_shape == i
+            }
+        aliases = dict(zip(ALL_POSITIONS, (inner2person[i].alias for i in inner)))
+        other = tuple(inner2person[i].other_shape for i in inner)
 
-    def init_statues(self, key_set: KeySetType, /) -> StateOfAllStatues:
-        """
-        Creates the initial state of all statues in the main room using this config.
-        """
-        return init_statues(
-            left_inner_shape=self.inner_shapes[0],
-            left_held_shape=self.held_shapes[0],
-            middle_inner_shape=self.inner_shapes[1],
-            middle_held_shape=self.held_shapes[1],
-            right_inner_shape=self.inner_shapes[2],
-            right_held_shape=self.held_shapes[2],
-            key_set=key_set,
+        rooms = Combination(
+            left=Node.from_inner_and_other(inner[0], other[0]),
+            middle=Node.from_inner_and_other(inner[1], other[1]),
+            right=Node.from_inner_and_other(inner[2], other[2]),
             )
+
+        held = self.held_shapes
+        statues = Combination(
+            left=Node.from_inner_and_other(inner[0], held[0] - inner[0]),
+            middle=Node.from_inner_and_other(inner[1], held[1] - inner[2]),
+            right=Node.from_inner_and_other(inner[2], held[2] - inner[2]),
+            )
+
+        return rooms, statues, aliases
 
 
 def read_config(filepath: str, /) -> Config:
