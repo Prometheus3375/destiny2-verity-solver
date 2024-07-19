@@ -126,4 +126,4 @@ def read_config(filepath: str, /) -> Config:
         )
 
 
-__all__ = 'Config', 'read_config'
+__all__ = 'KeySetName', 'Config', 'read_config'
