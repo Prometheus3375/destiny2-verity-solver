@@ -2,12 +2,11 @@ from collections import Counter
 from collections.abc import Iterator
 from dataclasses import dataclass
 from itertools import permutations
-from typing import Self, Sequence
+from typing import Self
 
 from .base import *
 from ..key_sets import KSMixed, KeySetType
 from ..multiset import Multiset
-from ..players import *
 from ..shapes import Shape2D
 
 
