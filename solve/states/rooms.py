@@ -115,6 +115,10 @@ class StateOfAllRooms(StateWithAllPositions[RoomState, PassMove]):
                         }
                     yield StateOfAllRooms(**kwargs)
 
+    # Required for correct type hinting in stupid PyCharm...
+    def solve(self, /, is_doing_triumph: bool, last_position_touched: str | None) -> Self: ...
+    del solve
+
 
 def init_rooms(
         *,
