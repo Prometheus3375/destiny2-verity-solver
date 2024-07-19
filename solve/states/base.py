@@ -165,6 +165,38 @@ class StateWithAllPositions[S: State, M: PMove]:
         """
         raise NotImplementedError
 
+    def solve(self, /, is_doing_triumph: bool, last_position_touched: str | None) -> Self:
+        """
+        Makes moves starting from this state until one of the next states is done,
+        then returns that done state.
+        """
+        # region First cycle
+        if is_doing_triumph and last_position_touched:
+            states = [
+                next_state
+                for next_state in self.next_states(is_doing_triumph)
+                if last_position_touched != next_state.first_position
+                ]
+        else:
+            states = list(self.next_states(is_doing_triumph))
+
+        # endregion
+
+        for _ in range(self.max_cycles - 1):
+            states = [
+                next_state
+                for state in states
+                for next_state in state.next_states(is_doing_triumph)
+                ]
+            for state in states:
+                if state.is_done:
+                    return state
+        else:
+            raise ValueError(
+                f'cannot solve encounter with initial {self} '
+                f'within {self.max_cycles} cycles'
+                )
+
     def __repr__(self, /) -> str:
         return (
             f'{self.__class__.__name__}('
