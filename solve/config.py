@@ -2,26 +2,26 @@ import tomllib
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from .key_sets import *
 from .players import *
 from .shapes import *
 from .states import *
-from .key_sets import KeySetType
 
 number2shape = {
-    0:  circle,
-    3:  triangle,
-    4:  square,
+    circle.code:   circle,
+    triangle.code: triangle,
+    square.code:   square,
 
-    20: sphere,
-    23: pyramid,
-    33: pyramid,
-    24: cube,
-    44: cube,
+    20:            sphere,
+    23:            pyramid,
+    33:            pyramid,
+    24:            cube,
+    44:            cube,
 
-    30: cone,
-    40: cylinder,
-    34: prism,
-    43: prism,
+    30:            cone,
+    40:            cylinder,
+    34:            prism,
+    43:            prism,
     }
 
 

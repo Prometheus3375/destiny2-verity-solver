@@ -18,6 +18,8 @@ class Shape:
 
 @dataclass(repr=False, eq=False, frozen=True, slots=True)
 class Shape2D(Shape):
+    code: int
+
     def __add__(self, other: 'Shape2D', /) -> 'Shape3D':
         result = _addition.get((self, other))
         return NotImplemented if result is None else result
@@ -61,9 +63,9 @@ class Shape3D(Shape):
 _addition: dict[tuple[Shape2D, Shape2D], Shape3D] = {}
 _subtraction: dict[tuple[Shape3D, Shape2D], Shape2D] = {}
 
-circle = Shape2D('circle')
-triangle = Shape2D('triangle')
-square = Shape2D('square')
+circle = Shape2D('circle', 0)
+triangle = Shape2D('triangle', 3)
+square = Shape2D('square', 4)
 
 sphere = Shape3D('sphere', circle, circle)
 pyramid = Shape3D('pyramid', triangle, triangle)
