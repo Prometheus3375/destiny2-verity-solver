@@ -1,3 +1,18 @@
+key_set = 'mixed'
+# Which key set to use in order to complete the ecnounter.
+# mixed - cone, cylinder, prism
+# double - sphere, pyramid, cube
+# If not present, defaults to mixed.
+
+# You want to use mixed key set because this set always solves rooms in 6 steps
+# and dissection in 4-6 steps.
+# Use double only when you are doing challenge.
+# To complete the challenge, you can use mixed-double-mixed or double-mixed-double;
+# the former is easier.
+# There are actually two double key sets,
+# the script determines the best by checking the number of steps required.
+# The script always prints the final 3D shapes from left to right at the start.
+
 is_doing_triumph = false
 # Whether players are going to complete triumph on Verity encounter.
 # If not present, defaults to false.
