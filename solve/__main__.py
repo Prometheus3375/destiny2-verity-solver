@@ -3,9 +3,10 @@ from enum import StrEnum
 from typing import assert_never
 
 import solve
-from .config import read_config
+from .combo import get_best_double_key
+from .config import KeySetName, read_config
+from .key_sets import *
 from .printer import *
-from .solver import solve_state
 
 
 class EncounterParts(StrEnum):
@@ -37,18 +38,30 @@ def main(
 
     with_triumph = config.is_doing_triumph
     last_position = config.last_position
+    rooms, statues, aliases = config.encounter_data()
+    match config.key_set_name:
+        case KeySetName.MIXED:
+            key_set = KSMixed
+        case KeySetName.DOUBLE:
+            key_set = get_best_double_key(
+                rooms=rooms if do_rooms else None,
+                statues=statues if do_dissect else None,
+                )
+        case unknown:
+            assert_never(unknown)
+
     if do_rooms:
-        room_state, aliases = config.init_rooms()
-        moves = solve_state(room_state, with_triumph, last_position).moves_made
-        print_pass_moves(aliases, moves, interactive)
-        last_position = moves[-1].destination
+        room_state = rooms.to_room_state(key_set)
+        rooms_solved = room_state.solve(with_triumph, last_position)
+        print_pass_moves(rooms_solved, aliases, interactive)
+        last_position = rooms_solved.last_position
 
     if do_dissect:
         if do_rooms: print('\n')
 
-        statue_state = config.init_statues()
-        moves = solve_state(statue_state, with_triumph, last_position).moves_made
-        print_dissect_moves(moves, interactive)
+        statue_state = statues.to_statue_state(key_set)
+        statues_solved = statue_state.solve(with_triumph, last_position)
+        print_dissect_moves(statues_solved, interactive)
 
 
 def define_parser() -> ArgumentParser:
@@ -65,10 +78,13 @@ def define_parser() -> ArgumentParser:
         choices=EncounterParts,
         default=EncounterParts.BOTH,
         help='Specifies what encounter part to solve.\n'
-             '  - "solo-rooms" - the script prints solution only for solo rooms.\n'
-             '  - "dissection" - the script prints solution only for dissection.\n'
-             '  - "both" - the script prints solution for solo rooms, then for dissection.\n'
-             'Defaults to "both".',
+             f'  - "{EncounterParts.SOLO_ROOMS}" - '
+             f'the script prints solution only for solo rooms.\n'
+             f'  - "{EncounterParts.DISSECTION}" - '
+             f'the script prints solution only for dissection.\n'
+             f'  - "{EncounterParts.BOTH}" - '
+             f'the script prints solution for solo rooms, then for dissection.\n'
+             f'Defaults to "{EncounterParts.BOTH}".',
         )
 
     parser.add_argument(
