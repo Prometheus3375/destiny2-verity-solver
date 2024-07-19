@@ -1,5 +1,6 @@
 import tomllib
 from dataclasses import dataclass
+from enum import Enum
 
 from .key_sets import *
 from .players import *
@@ -24,8 +25,14 @@ number2shape = {
     }
 
 
+class KeySetName(Enum):
+    MIXED = 'mixed'
+    DOUBLE = 'double'
+
+
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Config:
+    key_set_name: KeySetName
     inner_shapes: tuple[Shape2D, Shape2D, Shape2D]
     held_shapes: tuple[Shape3D, Shape3D, Shape3D]
     players: tuple[Player, Player, Player]
@@ -65,6 +72,10 @@ def read_config(filepath: str, /) -> Config:
     with open(filepath, 'rb') as f:
         data = tomllib.load(f)
 
+    key_set_name = data.get('key_set', 'mixed')
+    assert key_set_name in KeySetName, \
+        f'key_set must be either {KeySetName.MIXED.value!r} or {KeySetName.DOUBLE.value!r}'
+
     is_doing_triumph = data.get('is_doing_triumph', False)
     assert isinstance(is_doing_triumph, bool), 'is_doing_triumph must be a boolean'
 
@@ -101,6 +112,7 @@ def read_config(filepath: str, /) -> Config:
         players.append(Player(**p))
 
     return Config(
+        key_set_name=KeySetName(key_set_name),
         inner_shapes=(inner[0], inner[1], inner[2]),
         held_shapes=(held[0], held[1], held[2]),
         players=(players[0], players[1], players[2]),
