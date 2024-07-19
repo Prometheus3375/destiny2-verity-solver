@@ -77,7 +77,7 @@ def read_config(filepath: str, /) -> Config:
     with open(filepath, 'rb') as f:
         data = tomllib.load(f)
 
-    key_set_name = data.get('key_set', 'mixed')
+    key_set_name = data.get('key_set', KeySetName.MIXED.value)
     assert key_set_name in KeySetName, \
         f'key_set must be either {KeySetName.MIXED.value!r} or {KeySetName.DOUBLE.value!r}'
 
