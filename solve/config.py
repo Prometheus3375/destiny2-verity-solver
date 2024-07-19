@@ -62,7 +62,7 @@ class Config:
         held = self.held_shapes
         statues = Combination(
             left=Node.from_inner_and_other(inner[0], held[0] - inner[0]),
-            middle=Node.from_inner_and_other(inner[1], held[1] - inner[2]),
+            middle=Node.from_inner_and_other(inner[1], held[1] - inner[1]),
             right=Node.from_inner_and_other(inner[2], held[2] - inner[2]),
             )
 
