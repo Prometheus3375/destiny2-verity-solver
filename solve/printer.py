@@ -14,6 +14,9 @@ def print_pass_moves(
     Prints pass moves to the console.
     If ``interactive`` is ``True``, prompts the user before continuing.
     """
+    print('--- FINAL SHAPES FROM LEFT TO RIGHT ---')
+    print(state.left.current_key, state.middle.current_key, state.right.current_key)
+
     position2collect = defaultdict(deque)
     for m in state.moves_made:
         position2collect[m.departure].appendleft(m.shape)
@@ -49,8 +52,10 @@ def print_dissect_moves(state: StateOfAllStatues, /, interactive: bool) -> None:
     Prints dissect moves to the console.
     If ``interactive`` is ``True``, prompts the user before continuing.
     """
-    print_move = input if interactive else print
+    print('--- FINAL SHAPES FROM LEFT TO RIGHT ---')
+    print(state.left.shape_held, state.middle.shape_held, state.right.shape_held)
 
+    print_move = input if interactive else print
     print('--- STEPS FOR DISSECTION ---')
     for m in state.moves_made:
         print_move(f'Dissect {m.shape} from {m.destination}')
