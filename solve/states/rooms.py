@@ -7,7 +7,7 @@ from typing import Self
 from .base import *
 from ..key_sets import KSMixed, KeySetType
 from ..multiset import Multiset
-from ..shapes import Shape2D
+from ..shapes import Shape2D, Shape3D
 
 
 @dataclass(frozen=True, kw_only=True, slots=True)
@@ -62,6 +62,17 @@ class RoomState(State):
     @property
     def shapes_available(self, /) -> Multiset[Shape2D]:
         return self.dropping_shapes
+
+    @property
+    def current_key(self, /) -> Shape3D:
+        """
+        The 3D shape a player can get after collecting dropping shapes.
+        """
+        if self.dropping_shapes.total == 2:
+            s1, s2 = self.dropping_shapes.elements()
+            return s1 + s2
+
+        raise ValueError('3D shape is not available')
 
     def pass_shape(self, shape: Shape2D, other: Self, /) -> [Self, Self]:
         """
