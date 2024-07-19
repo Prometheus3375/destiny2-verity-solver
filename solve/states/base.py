@@ -10,7 +10,7 @@ MIDDLE: Literal['middle'] = 'middle'
 RIGHT: Literal['right'] = 'right'
 type PositionsType = Literal['left', 'middle', 'right']
 
-_POSITIONS = {LEFT, MIDDLE, RIGHT}
+ALL_POSITIONS = {LEFT: None, MIDDLE: None, RIGHT: None}
 _POSITIONS_MSG = f'{LEFT!r}, {MIDDLE!r} or {RIGHT!r}'
 
 
@@ -18,7 +18,7 @@ def is_position(s: str, /) -> TypeGuard[PositionsType]:
     """
     Returns ``True`` if a string is a valid position.
     """
-    return s in _POSITIONS
+    return s in ALL_POSITIONS
 
 
 class PMove(Protocol):
@@ -125,7 +125,7 @@ class StateWithAllPositions[S: State, M: PMove]:
         self.moves_made = moves_made
 
     # region Verify that constructor and slots have POSITIONS
-    assert set(__slots__) >= _POSITIONS, f'encounter state must have position attributes'
+    assert set(__slots__) >= ALL_POSITIONS.keys(), f'encounter state must have position attributes'
 
     signature_ = signature(__init__)
     kwargs = {
@@ -134,7 +134,7 @@ class StateWithAllPositions[S: State, M: PMove]:
         if p.kind == p.KEYWORD_ONLY or p.kind == p.POSITIONAL_OR_KEYWORD
         }
 
-    assert kwargs >= _POSITIONS, f'encounter state must have position keyword arguments'
+    assert kwargs >= ALL_POSITIONS.keys(), f'encounter state must have position keyword arguments'
     del signature_, kwargs
     # endregion
 
@@ -180,6 +180,7 @@ __all__ = (
     'LEFT',
     'MIDDLE',
     'RIGHT',
+    'ALL_POSITIONS',
     'PositionsType',
     'is_position',
     'State',

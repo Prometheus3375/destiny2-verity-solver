@@ -184,7 +184,7 @@ def init_rooms_from_players(
         for p in players
         if p.their_shape == i
         }
-    aliases = dict(zip((LEFT, MIDDLE, RIGHT), (inner2person[i].alias for i in inner_shapes)))
+    aliases = dict(zip(ALL_POSITIONS, (inner2person[i].alias for i in inner_shapes)))
     other = tuple(inner2person[i].other_shape for i in inner_shapes)
     state = init_rooms(
         left_inner_shape=inner_shapes[0],
