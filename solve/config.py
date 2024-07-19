@@ -1,5 +1,4 @@
 import tomllib
-from collections.abc import Sequence
 from dataclasses import dataclass
 
 from .key_sets import *
@@ -27,9 +26,9 @@ number2shape = {
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Config:
-    inner_shapes: Sequence[Shape2D]
-    held_shapes: Sequence[Shape3D]
-    players: Sequence[Player]
+    inner_shapes: tuple[Shape2D, Shape2D, Shape2D]
+    held_shapes: tuple[Shape3D, Shape3D, Shape3D]
+    players: tuple[Player, Player, Player]
     is_doing_triumph: bool
     last_position: PositionsType | None
 
@@ -102,9 +101,9 @@ def read_config(filepath: str, /) -> Config:
         players.append(Player(**p))
 
     return Config(
-        inner_shapes=inner,
-        held_shapes=held,
-        players=players,
+        inner_shapes=(inner[0], inner[1], inner[2]),
+        held_shapes=(held[0], held[1], held[2]),
+        players=(players[0], players[1], players[2]),
         is_doing_triumph=is_doing_triumph,
         last_position=last_position,
         )
