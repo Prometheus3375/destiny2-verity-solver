@@ -36,3 +36,10 @@ Run `python -m solve --help` to see more options.
 
 - For example, instead of `both` you can use `solo-rooms` to get steps only for solo rooms.
 - Option `-i` pauses output after every step. Press Enter to proceed to the next step.
+
+# Development
+
+# Running tests
+
+1. Open terminal in the root of this project.
+2. Run `python -m unittest discover tests "test_*.py" .` to run all tests.
