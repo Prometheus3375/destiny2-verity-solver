@@ -30,6 +30,7 @@ A tool to solve the 4th encounter, Verity, in Destiny 2 raid "Salvation's Edge".
     Fill `held_shapes`.
 11. In opened PowerShell window type `python -m solve both` and press Enter.
 12. Follow the steps printed in the console window.
+13. If you are doing the challenge, on the second phase set `key_set` to `double`.
 
 Run `python -m solve --help` to see more options.
 
