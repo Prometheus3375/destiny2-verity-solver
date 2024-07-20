@@ -1,6 +1,5 @@
 from collections import Counter
 from collections.abc import Iterable, Iterator, Set
-from itertools import product
 from typing import Any, Self
 
 
@@ -101,8 +100,16 @@ class Multiset[T]:
         """
         Returns ``True`` if this set and other have no common elements.
         """
-        for _ in product(self, other):
-            return False
+        if len(self) < len(other):
+            shorter = self
+            longer = other
+        else:
+            shorter = other
+            longer = self
+
+        for e in shorter:
+            if e in longer:
+                return False
 
         return True
 
