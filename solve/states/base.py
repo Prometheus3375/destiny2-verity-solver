@@ -94,6 +94,9 @@ class State:
         """
         raise NotImplementedError
 
+    def __contains__(self, item: Shape2D, /) -> bool:
+        return item in self.shapes_available
+
     def is_shape_required(self, shape: Shape2D, /) -> bool:
         """
         Return ``True`` if the given shape is required for this state to be done.
