@@ -17,6 +17,7 @@ def print_pass_moves(
     print('--- FINAL SHAPES FROM LEFT TO RIGHT ---')
     print(state.left.current_key, state.middle.current_key, state.right.current_key)
 
+    check_destination = set()
     position2collect = defaultdict(deque)
     for m in state.moves_made:
         position2collect[m.departure].appendleft(m.shape)
@@ -34,9 +35,18 @@ def print_pass_moves(
             f'Player {aliases[m.departure]}: '
             f'pass {m.shape} to {m.destination}'
             )
+
         shapes = position2collect[m.departure]
         if shapes:
-            print_move(f'Player {aliases[m.departure]}: collect {shapes.pop()}')
+            if shapes[-1] in m.departure_state:
+                print_move(f'Player {aliases[m.departure]}: collect {shapes.pop()}')
+            else:
+                check_destination.add(m.departure)
+
+        if m.destination in check_destination:
+            shapes = position2collect[m.destination]
+            print_move(f'Player {aliases[m.destination]}: collect {shapes.pop()}')
+            check_destination.remove(m.destination)
 
     print(
         '--- SOLO ROOMS ARE DONE ---\n'
