@@ -51,7 +51,6 @@ def print_pass_moves(
     print(
         '--- SOLO ROOMS ARE DONE ---\n'
         'All player in the solo rooms must collect two shapes and wait\n'
-        'Proceed with dissection\n'
         '--- LAST POSITION ---\n'
         f'{state.last_position}'
         )
