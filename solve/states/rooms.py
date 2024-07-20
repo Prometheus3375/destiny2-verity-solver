@@ -10,13 +10,6 @@ from ..multiset import Multiset
 from ..shapes import Shape2D, Shape3D
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
-class PassMove:
-    departure: PositionsType
-    shape: Shape2D
-    destination: PositionsType
-
-
 class RoomState(State):
     __slots__ = 'dropping_shapes', 'final_dropping_shapes'
 
@@ -96,6 +89,16 @@ class RoomState(State):
         return new_self, new_other
 
 
+@dataclass(frozen=True, kw_only=True, slots=True)
+class PassMove:
+    departure: PositionsType
+    shape: Shape2D
+    destination: PositionsType
+    # States AFTER move is done
+    departure_state: RoomState
+    destination_state: RoomState
+
+
 class StateOfAllRooms(StateWithAllPositions[RoomState, PassMove]):
     __slots__ = ()
 
@@ -117,7 +120,13 @@ class StateOfAllRooms(StateWithAllPositions[RoomState, PassMove]):
             for shape in s1.shapes_available:
                 if s2.is_shape_required(shape):
                     new_s1, new_s2 = s1.pass_shape(shape, s2)
-                    move = PassMove(departure=s1.position, shape=shape, destination=s2.position)
+                    move = PassMove(
+                        departure=s1.position,
+                        shape=shape,
+                        destination=s2.position,
+                        departure_state=new_s1,
+                        destination_state=new_s2,
+                        )
                     kwargs = {
                         s1.position:  new_s1,
                         s2.position:  new_s2,
